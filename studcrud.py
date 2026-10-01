@@ -61,24 +61,6 @@ def get_student_by_id(student_id: int):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching student data: {e}")
-
-
-@app.delete("/students/{student_id}")
-def delete_student(student_id: int):
-    try:
-        with SessionLocal() as session:
-            result = session.execute(
-                text("DELETE FROM students WHERE id = :id"), 
-                {"id": student_id}
-            )
-            session.commit()
-            if result.rowcount == 0:
-                raise HTTPException(status_code=404, detail="Student not found")
-            return {"message": "Student deleted successfully"}
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error deleting student: {e}")    
     
 from pydantic import BaseModel ,Field , EmailStr, HttpUrl, field_validator   
 class StudentCreate(BaseModel):
@@ -119,15 +101,20 @@ def update_student(student_id: int, student: StudentUpdate):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error updating student: {e}")
 
+
 @app.delete("/students/{student_id}")
 def delete_student(student_id: int):
     try:
         with SessionLocal() as session:
-            session.execute(
-                text("DELETE FROM students WHERE id = :id"),
+            result = session.execute(
+                text("DELETE FROM students WHERE id = :id"), 
                 {"id": student_id}
             )
             session.commit()
-        return {"message": "Student deleted successfully"}
+            if result.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Student not found")
+            return {"message": "Student deleted successfully"}
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error deleting student: {e}")
+        raise HTTPException(status_code=500, detail=f"Error deleting student: {e}")    
