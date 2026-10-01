@@ -87,7 +87,7 @@ class StudentCreate(BaseModel):
     age: int = Field(ge=0, le=100)
     course: str = Field(min_length=2, max_length=50)
 
-@app.post("/student")
+@app.post("/students")
 def create_student(student: StudentCreate):
     try:
         with SessionLocal() as session:
